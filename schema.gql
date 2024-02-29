@@ -1,0 +1,1048 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+type Query {
+  getSingleReservation(hotelReservationId: String!, hotelId: String!): SingleReservation! @canonical
+  getHotelReservations(startReservationDate: String, endReservationDate: String, startLastModifyDateTime: String, endLastModifyDateTime: String, startCheckInDate: CheckInOutFilterType, endCheckInDate: String, startCheckOutDate: CheckInOutFilterType, endCheckOutDate: String, selectionType: SelectionType, resStatus: HotelResStatus, dateType: String, customerName: String, maxResponses: Int, nextToken: String, hotelReservationIds: [String!], bookingChannelIds: [String!], hotelIds: [String!]): HotelReservationConnection! @canonical
+  getPaymentCardTransactionId(hotelId: String!, paymentCardId: String!): String! @canonical
+  getReservationHistoric(hotelReservationId: String!, hotelId: String!): [ReservationHistoric!]! @canonical
+  getPushEvents(hotelReservationId: String!, hotelId: String!): [PushMessage!]! @canonical
+  getEmailNotifications(hotelReservationId: String!, hotelId: String!): [EmailNotification!]! @canonical
+}
+
+type SingleReservation @canonical {
+  forcedSellIndicator: Boolean
+  originalDeliveryMethodCode: Float
+  resStatus: HotelResStatus
+  roomStayReservation: Boolean
+  walkInIndicator: Boolean
+  createDateTime: String
+  lastModifyDateTime: String
+  purgeDate: String
+  pos: POS
+  resGlobalInfo: ResGlobalInfo
+  roomStays: [RoomStay!]!
+  services: [Service!]!
+  resGuests: [ResGuest!]!
+}
+
+enum HotelResStatus {
+  Book
+  Cancel
+  Commit
+  CommitOverrideEdits
+  Hold
+  Ignore
+  Initiate
+  Modify
+  Quote
+  Ticket
+  VerifyPrice
+}
+
+type POS @canonical {
+  source: Source!
+}
+
+type Source @canonical {
+  bookingChannel: BookingChannel
+  requestorID: RequestorID
+}
+
+type BookingChannel @canonical {
+  companyName: String
+  type: BookingChannelType!
+}
+
+enum BookingChannelType {
+  GlobalDistributionSystem
+  AlternativeDistributionSystem
+  SalesAndCateringSystem
+  PropertyManagementSystem
+  CentralReservationSystem
+  TourOperatorSystem
+  Internet
+  Kiosk
+  Agent
+}
+
+type RequestorID @canonical {
+  id: String!
+  type: UniqueIdType!
+}
+
+enum UniqueIdType {
+  Customer
+  CustomerReservationsOffice
+  CorporationRepresentative
+  Company
+  TravelAgency
+  Airline
+  Wholesaler
+  CarRental
+  Group
+  Hotel
+  TourOperator
+  CruiseLine
+  InternetBroker
+  Reservation
+  Cancellation
+  Reference
+  MeetingPlanningAgency
+  Other
+  InsuranceAgency
+  InsuranceAgent
+  Profile
+  ElectronicReservationServiceProvider
+  ProvisionalReservation
+  TravelAgentPNR
+  AssociatedReservation
+  AssociatedItineraryReservation
+  AssociatedSharedReservation
+  Alliance
+  BookingAgent
+  Ticket
+  DividedReservation
+  Merchant
+  Acquirer
+  MasterReference
+  PurgedMasterReference
+  ParentReference
+  ChildReference
+  LinkedReference
+  Contract
+  ConfirmationNumber
+  FareQuote
+  ReissueRefundQuote
+  GroundTransportationSupplier
+  EMD
+}
+
+type ResGlobalInfo @canonical {
+  basicPropertyInfo: BasicPropertyInfo!
+  cancelPenalties: [CancelPenalty!]
+  guestCounts: [GuestCount!]!
+  timeSpan: TimeSpan
+  comments: [Comment!]
+  specialRequests: [SpecialRequest!]
+  guarantee: Guarantee
+  depositPayments: [GuaranteePayment!]
+  total: Total
+  hotelReservationIDs: [HotelReservationID!]
+  profiles: [ProfileInfo!]
+}
+
+type BasicPropertyInfo @canonical {
+  hotelCode: String
+  hotelName: String
+  currencyCode: String
+}
+
+type CancelPenalty @canonical {
+  amountPercent: AmountPercent
+  deadline: Deadline
+  penaltyDescription: [ParagraphType!]
+  policyCode: String
+  noCancelInd: Boolean
+  nonRefundable: Boolean
+  sun: Boolean
+  mon: Boolean
+  tue: Boolean
+  weds: Boolean
+  thur: Boolean
+  fri: Boolean
+  sat: Boolean
+}
+
+type AmountPercent @canonical {
+  taxes: Taxes
+  applyAs: ApplyAsType
+  basisType: BasisType
+  feesInclusive: Boolean
+  nmbrOfNights: Int
+  overriddenAmountIndicator: Boolean
+  percent: Float
+  taxInclusive: Boolean
+  amount: Float
+  currencyCode: String
+  decimalPlaces: Int
+}
+
+type Taxes @canonical {
+  amount: String
+  currencyCode: String
+  decimalPlaces: Int
+  tax: [Tax!]
+}
+
+type Tax @canonical {
+  amount: String
+  code: FeeTaxType
+  currencyCode: String
+  decimalPlaces: Float
+  percent: Float
+  type: AmountDeterminationType
+}
+
+enum FeeTaxType {
+  BedTax
+  CityHotelFee
+  CityTax
+  CountyTax
+  EnergyTax
+  FederalTax
+  FoodBeverageTax
+  LodgingTax
+  MaintenanceFee
+  OccupancyTax
+  PackageFee
+  ResortFee
+  SalesTax
+  ServiceCharge
+  StateTax
+  Surcharge
+  TotalTax
+  TourismTax
+  SurplusLinesTax
+  InsurancePremiumTax
+  ApplicationFee
+  ExpressHandlingFee
+  Exempt
+  Standard
+  Miscellaneous
+  RoomTax
+  EarlyCheckoutFee
+  CountryTax
+  ExtraPersonCharge
+  BanquetServiceFee
+  RoomServiceFee
+  LocalFee
+  GoodsAndServicesTax
+  ValueAddedTax
+  CribFee
+  RollawayFee
+  AssessmentLicenseTax
+  PetSanitationFee
+  NotKnown
+  ChildRollawayCharge
+  ConventionTax
+  ExtraChildCharge
+  StandardFoodAndBeverageGratuity
+  NationalGovernmentTax
+  AdultRollawayFee
+  BeverageWithAlcohol
+  BeverageWithoutAlcohol
+  Tobacco
+  Food
+  TotalSurcharges
+  StateCostRecoveryFee
+  MiscellaneousFee
+  DestinationAmenityFee
+  RefundablePetFee
+}
+
+enum AmountDeterminationType {
+  Cumulative
+  Exclusive
+  Inclusive
+}
+
+enum ApplyAsType {
+  FirstAndLastNightDeposit
+  FirstAndLastNightPayment
+  FirstNightDeposit
+  FirstNightPayment
+  LastNightDepost
+  LastNightPayment
+}
+
+enum BasisType {
+  FirstLast
+  FullStay
+  Nights
+}
+
+type Deadline @canonical {
+  overrideIndicator: Boolean
+  absoluteDeadline: String
+  offsetDropTime: OffsetDropTimeType
+  offsetTimeUnit: String
+  offsetUnitMultiplier: Float
+}
+
+enum OffsetDropTimeType {
+  AfterArrival
+  AfterBooking
+  AfterConfirmation
+  AfterDeparture
+  BeforeArrival
+}
+
+type ParagraphType @canonical {
+  name: String
+  language: String
+  text: Text!
+}
+
+type Text @canonical {
+  formatted: Boolean
+  textFormat: TextFormatType
+  value: String
+}
+
+enum TextFormatType {
+  HTML
+  PlainText
+}
+
+type GuestCount @canonical {
+  ageQualifyingCode: AgeQualifyingCode
+  age: Int
+  count: Int
+}
+
+enum AgeQualifyingCode {
+  Over21
+  Over65
+  Under2
+  Under12
+  Under17
+  Under21
+  Infant
+  Child
+  Teenager
+  Adult
+  Senior
+  AdditionalOccupantWithAdult
+  AdditionalOccupantWithoutAdult
+  FreeChild
+  FreeAdult
+  YoungDriver
+  YoungerDriver
+  Under10
+  Junior
+}
+
+type TimeSpan @canonical {
+  duration: String
+  end: String
+  start: String
+}
+
+type Comment @canonical {
+  createDateTime: String
+  lastModifyDateTime: String
+  language: String
+  text: Text!
+}
+
+type SpecialRequest @canonical {
+  createDateTime: String
+  lastModifyDateTime: String
+  language: String
+  requestCode: String
+  text: Text!
+}
+
+type Guarantee @canonical {
+  holdTime: String
+  retributionType: RetributionType
+  guaranteeCode: String
+  guaranteeType: GuaranteeType
+  guaranteesAccepted: [GuaranteeAccepted!]
+}
+
+enum RetributionType {
+  ResAutoCancelled
+  ResNotGuaranteed
+}
+
+enum GuaranteeType {
+  CCDCVoucher
+  Deposit
+  DepositRequired
+  GuaranteeRequired
+  None
+  PrePay
+  Profile
+}
+
+type GuaranteeAccepted @canonical {
+  paymentCard: PaymentCard!
+}
+
+type PaymentCard @canonical {
+  cardCode: String
+  paymentCardId: String
+  expireDate: String
+  cardHolderName: String
+  cardType: String
+  cardNumber: EncryptionToken
+  seriesCode: EncryptionToken
+}
+
+type EncryptionToken @canonical {
+  mask: String
+  plainText: String
+}
+
+type GuaranteePayment @canonical {
+  paymentCode: PaymentType
+  nonRefundableIndicator: Boolean
+  guaranteeType: GuaranteeType
+  guaranteeCode: String
+  holdTime: String
+  retributionType: RetributionType
+  type: SequenceType
+  acceptedPayments: [AcceptedPayment!]
+  amountPercent: AmountPercent
+  deadline: [Deadline!]
+  description: [ParagraphType!]
+}
+
+enum PaymentType {
+  Cash
+  DirectBill
+  Voucher
+  PrePay
+  CreditCard
+  DebitCard
+  Check
+  Deposit
+  BusinessAccount
+  Coupon
+  BusinessCheck
+  PersonalCheck
+  MoneyOrder
+  Redemption
+  Barter
+  MiscellaneousChargeOrder
+  TravelAgencyNameAddress
+  TravelAgencyIATANumber
+  CertifiedCheck
+  FrequentGuestNumber
+  FrequentTravelerNumber
+  GuestNameAddress
+  SpecialIndustryProgram
+  TourOrder
+  TravelersCheck
+  WirePayment
+  CompanyNameAddress
+  CorporateIDCDNumber
+  OtherInformation
+  OverrideGuaranteeInformation
+  AirlinePaymentCard
+  AirTravelCard
+  Miscellaneous
+  None
+  Ticket
+  PaymentManager
+  PaymentService
+  MobilePayment
+  VirtualCard
+  GuaranteeToProperty
+  FlightNumber
+  OnlinePayment
+  PayByPoints
+  PayByEFT
+}
+
+enum SequenceType {
+  AcceptedPaymentForms
+  GuaranteePolicy
+  RequiredPayment
+}
+
+type AcceptedPayment @canonical {
+  guaranteeTypeCode: PaymentType
+  guaranteeID: String
+  guaranteeIndicator: Boolean
+  paymentTransactionTypeCode: PaymentFormType
+  paymentCard: PaymentCard!
+}
+
+enum PaymentFormType {
+  Charge
+  Refund
+  Reserve
+}
+
+type Total @canonical {
+  amountAfterTax: String
+  amountBeforeTax: String
+  currencyCode: String
+  decimalPlaces: Int
+  taxes: Taxes
+}
+
+type HotelReservationID @canonical {
+  forGuest: Boolean
+  resIdDate: String
+  resIdSource: String
+  resIdSourceContext: String
+  resIdType: UniqueIdType
+  resIdValue: String
+}
+
+type ProfileInfo @canonical {
+  profile: Profile!
+  uniqueID: [UniqueID!]
+}
+
+type Profile @canonical {
+  createDateTime: String
+  lastModifyDateTime: String
+  statusCode: ProfileStatus
+  profileType: ProfileType
+  optInStatus: OptInStatus
+  customer: Customer
+  companyInfo: CompanyInfo
+}
+
+enum ProfileStatus {
+  MarkedForDeletion
+  Lapsed
+  Terminated
+  Active
+  Inactive
+}
+
+enum ProfileType {
+  Customer
+  GDS
+  Corporation
+  TravelAgent
+  Wholesaler
+  Group
+  TourOperator
+  CRO
+  RepresentationCompany
+  InternetBroker
+  Airline
+  Hotel
+  CarRental
+  CruiseLine
+  Employee
+  EventHost
+  SupplierPartner
+  BillingContact
+  AuthorizedSigner
+  GeneralServiceContractor
+  Arranger
+  Association
+  TravelAgency
+}
+
+enum OptInStatus {
+  OptedIn
+  OptedOut
+  Unknown
+}
+
+type Customer @canonical {
+  maritalStatus: MaritalStatus
+  gender: Gender
+  language: String
+  birthDate: String
+  personName: [PersonName!]
+  telephone: [Telephone!]
+  email: [Email!]
+  address: [Address!]
+}
+
+enum MaritalStatus {
+  Annulled
+  CoHabitating
+  Divorced
+  Engaged
+  Married
+  Separated
+  Single
+  Unknown
+  Widowed
+}
+
+enum Gender {
+  Female
+  FemaleNoShare
+  Male
+  MaleNoShare
+  Unknown
+}
+
+type PersonName @canonical {
+  language: String
+  givenName: String
+  surname: String!
+}
+
+type Telephone @canonical {
+  phoneLocationType: PhoneLocationType
+  phoneTechType: PhoneTechnologyType
+  phoneUseType: PhoneUseType
+  shareMarketInd: ShareInd
+  shareSynchInd: ShareInd
+  formattedInd: Boolean
+  phoneNumber: String!
+}
+
+enum PhoneLocationType {
+  BrandReservationsOffice
+  CentralReservationsOffice
+  PropertyReservationOffice
+  PropertyDirect
+  SalesOffice
+  Home
+  Office
+  Other
+  ManagingCompany
+  Mobile
+}
+
+enum PhoneTechnologyType {
+  Voice
+  Fax
+  Pager
+  TTY
+}
+
+enum PhoneUseType {
+  EmergencyContact
+  TravelArranger
+  DaytimeContact
+  EveningContact
+  Contact
+  TollFreeNumber
+  GuestUse
+  PickupContact
+  Mobile
+}
+
+enum ShareInd {
+  Inherit
+  No
+  Yes
+}
+
+type Email @canonical {
+  shareMarketInd: ShareInd
+  shareSynchInd: ShareInd
+  emailType: EmailAddressType
+  textFormat: TextFormat
+  value: String!
+}
+
+enum EmailAddressType {
+  Personal
+  Business
+  Listserve
+  Property
+  SalesOffice
+  ReservationOffice
+  ManagingCompany
+}
+
+enum TextFormat {
+  TextHtml
+  TextPlain
+}
+
+type Address @canonical {
+  addressLine: String
+  cityName: String
+  postalCode: String
+  shareMarketInd: ShareInd
+  shareSynchInd: ShareInd
+  formattedInd: Boolean
+  companyName: CompanyName
+  countryName: CountryName
+}
+
+type CompanyName @canonical {
+  value: String!
+  companyShortName: String
+  code: String
+  travelSector: TravelSector
+}
+
+enum TravelSector {
+  Air
+  Car
+  Hotel
+  Insurance
+  Golf
+  Tour
+  Rail
+  Cruise
+  Excursion
+  Ferry
+  PackageOption
+}
+
+type CountryName @canonical {
+  value: String!
+  code: String!
+}
+
+type CompanyInfo @canonical {
+  email: [Email!]
+  telephoneInfo: [Telephone!]
+  companyName: [CompanyName!]
+  addressInfo: [Address!]
+}
+
+type UniqueID @canonical {
+  id: String!
+  idContext: String
+  type: UniqueIdType!
+}
+
+type RoomStay @canonical {
+  indexNumber: Int!
+  roomStayStatus: HotelResStatus
+  roomTypes: [RoomType!]
+  ratePlans: [RatePlan!]
+  basicPropertyInfo: BasicPropertyInfo
+  guestCounts: [GuestCount!]
+  cancelPenalties: [CancelPenalty!]
+  timeSpan: TimeSpan
+  total: Total
+  discount: Discount
+  guarantee: Guarantee
+  depositPayments: [GuaranteePayment!]
+  serviceRPHs: [ServiceRPH!]
+  resGuestRPHs: [Int!]
+  comments: [Comment!]
+  specialRequests: [SpecialRequest!]
+  roomRates: [RoomRate!]
+}
+
+type RoomType @canonical {
+  roomID: String
+  isRoom: Boolean
+  roomDescription: ParagraphType
+}
+
+type RatePlan @canonical {
+  ratePlanType: RatePlanType
+  ratePlanName: String
+  ratePlanID: String
+  mealsIncluded: MealsIncluded
+}
+
+enum RatePlanType {
+  Association
+  ClubConcierge
+  Convention
+  Corporate
+  DayRate
+  DistressedInventory
+  FamilyPlan
+  Government
+  Military
+  Negotiated
+  Package
+  Promotional
+  RegularRack
+  SeniorCitizen
+  TourWholesale
+  TravelIndustry
+  Weekend
+  LastRoomAvailable
+  NonLastRoomAvailable
+  Consortia
+  Group
+  Contract
+  PromotionalPackageTour
+  Published
+  Net
+  MultiDayPackage
+  Weekly
+  Monthly
+  StandardRedemptionRate
+  DiscountRedemptionRate
+  CashAndPointsRedemptionRate
+  PointUpgradeRedemptionRate
+  CashUpgradeRedemptionRate
+}
+
+type MealsIncluded @canonical {
+  breakfast: Boolean
+  lunch: Boolean
+  dinner: Boolean
+  mealPlanCodes: MealPlanType
+  mealPlanIndicator: Boolean
+}
+
+enum MealPlanType {
+  AllInclusive
+  AmericanFullBoard
+  BuffetBreakfast
+  ContinentalBreakfast
+  EnglishBreakfast
+  FullBreakfast
+  HalfBoardModifiedAmericanPlan
+  RoomOnlyEuropeanPlan
+  SelfCatering
+  Breakfast
+  Lunch
+  Dinner
+  BreakfastLunch
+}
+
+type Discount @canonical {
+  discountCode: String
+  currencyCode: String
+  amountAfterTax: Float
+  amountBeforeTax: Float
+  discountReason: ParagraphType!
+  taxes: Taxes
+  additionalFeesExcludedIndicator: Boolean
+  amountIncludingMarkup: String
+  percent: Float
+  rateOverrideIndicator: Boolean
+  restrictedDisplayIndicator: Boolean
+  serviceOverrideIndicator: Boolean
+  taxInclusive: Boolean
+  type: ChargeType
+  decimalPlaces: Int
+}
+
+enum ChargeType {
+  Daily
+  Hourly
+  HalfDay
+  AdditionsPerStay
+  PerOccurrence
+  PerEvent
+  PerPerson
+  FirstUse
+  OneTimeUse
+  PerMinute
+  PerFunction
+  PerStay
+  Complimentary
+  Other
+  MaximumCharge
+  OverMinuteCharge
+  Weekly
+  PerRoomPerStay
+  PerRoomPerNight
+  PerPersonPerStay
+  PerPersonPerNight
+  MinimumCharge
+  PerRental
+  PerItem
+  PerRoom
+  PerReservationBooking
+  PerGallon
+  PerDozen
+  PerTray
+  PerOrder
+  PerUnit
+  OneWay
+  RoundTrip
+}
+
+type ServiceRPH @canonical {
+  isPerRoom: Boolean
+  rph: String
+}
+
+type RoomRate @canonical {
+  effectiveDate: String
+  expireDate: String
+  expireDateExclusiveInd: Boolean
+  ratePlanID: String
+  serviceRPHs: [ServiceRPH!]
+  roomRateDescription: [ParagraphType!]
+  rates: [Rate!]
+}
+
+type Rate @canonical {
+  effectiveDate: String
+  expireDate: String
+  expireDateExclusiveInd: Boolean
+  ageQualifyingCode: AgeQualifyingCode
+  base: Total
+  total: Total
+  discount: [Discount!]
+}
+
+type Service @canonical {
+  serviceRPH: String
+  id: String!
+  type: UniqueIdType
+  servicePricingType: PricingType
+  inclusive: Boolean
+  quantity: Int
+  serviceCategoryCode: String
+  requiredInd: Boolean
+  price: Price
+  serviceDetails: ServiceDetails
+}
+
+enum PricingType {
+  PerNight
+  PerPerson
+  PerPersonPerNight
+  PerStay
+  PerUse
+}
+
+type Price @canonical {
+  effectiveDate: String
+  expireDate: String
+  numberOfUnits: Int
+  base: Total
+  total: Total
+  discount: [Discount!]
+}
+
+type ServiceDetails @canonical {
+  serviceDescription: ParagraphType
+  timeSpan: TimeSpan
+}
+
+type ResGuest @canonical {
+  resGuestRPH: String
+  arrivalTime: String
+  departureTime: String
+  ageQualifyingCode: AgeQualifyingCode
+  age: Int
+  profiles: [ProfileInfo!]
+}
+
+type HotelReservationConnection @canonical {
+  HotelReservations: [HotelReservation!]!
+  nextToken: String
+}
+
+type HotelReservation @canonical {
+  hotelReservationHistoricId: ID!
+  hotelReservationId: String!
+  hotelId: String!
+  bookingChannelId: Int!
+  connectionId: Int
+  bookingChannelName: String!
+  remoteHotelName: String
+  remoteHotelCode: String
+  reservationCode: String!
+  createDateTime: String!
+  customerNames: [String!]!
+  guestNames: [String!]!
+  roomCount: Int!
+  lastModifyDateTime: String!
+  forcedSellIndicator: Boolean!
+  originalDeliveryMethodCode: Int!
+  resStatus: String!
+  roomStayReservation: Boolean
+  walkInIndicator: Boolean!
+  amountBeforeTax: Float
+  amountAfterTax: Float
+  currencyCode: String!
+  guestCount: Int!
+  checkInDate: String!
+  checkOutDate: String!
+  duration: String!
+  mappingError: Boolean
+  purgeDate: String!
+  removal: Boolean
+  timeStamp: String!
+  primaryLangId: String
+  markedAsRead: Boolean!
+  numberOfRetrieves: Int
+  exported: Boolean
+}
+
+input CheckInOutFilterType @canonical {
+  date: String!
+  comparison: DateComparisonEnum!
+}
+
+enum DateComparisonEnum {
+  DateEqual
+  DateEqualOrAfter
+  DateEqualOrBefore
+}
+
+enum SelectionType {
+  All
+  PreviouslyDelivered
+  Undelivered
+}
+
+type ReservationHistoric @canonical {
+  hotelReservationHistoricId: String!
+  hotelReservationId: String!
+  ImportMessage: String!
+  CreateDateTime: String!
+  LastModifyDateTime: String!
+  Exported: Boolean!
+  ReadyToExport: Boolean!
+  ExportMessage: String
+  ExportConfirmationNumber: String
+}
+
+type PushMessage @canonical {
+  bookingChannelId: String!
+  BookingChannelName: String!
+  events: [PushEvent!]!
+}
+
+type PushEvent @canonical {
+  eventId: String!
+  Object: String!
+  Method: String!
+  CreateDateTime: String!
+  LastModifyDateTime: String!
+  StatusCode: String!
+  errorMessage: String
+}
+
+type EmailNotification @canonical {
+  emailId: String!
+  emailTo: String!
+  emailStatus: EmailNotificationStatusEnum!
+  type: String!
+  CreateDateTime: String!
+}
+
+enum EmailNotificationStatusEnum {
+  Created
+  Processed
+  Dropped
+  Delivered
+  Deferred
+  Bounce
+  Open
+  Click
+  Spam
+  Report
+}
+
+type Mutation {
+  flagReservationsAs(dateFilter: ReservationDateFilter, hotelReservationIds: [String!], hotelId: String!, flag: ReservationFlag!): Boolean! @canonical
+  replayReservationMessage(hotelReservationHistoricId: String!, hotelReservationId: String!, hotelId: String!): Boolean! @canonical
+  pushReservationToChannel(bookingChannelId: String!, hotelReservationId: String!, hotelId: String!): Boolean! @canonical
+  sendEmailNotification(emailId: String, action: NotificationActionEnum!, hotelReservationId: String!, hotelId: String!): Boolean! @canonical
+}
+
+enum ReservationDateFilter {
+  BEFORE_TODAY
+  TODAY_AND_FUTURE
+}
+
+enum ReservationFlag {
+  SEEN
+  UNSEEN
+  EXPORTED
+  UNEXPORTED
+}
+
+enum NotificationActionEnum {
+  SEND
+  RESEND
+}
